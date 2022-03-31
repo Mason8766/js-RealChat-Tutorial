@@ -1,27 +1,22 @@
-var express = require('express');
-var app = express();
-//STEP 3: Setup bootstrap
-const path = require("path")
-app.use(
-  "/css",
-  express.static(path.join(__dirname, "node_modules/bootstrap/dist/css"))
-)
+const express = require('express');
+const app = express();
+const http = require('http');
+const server = http.createServer(app);
 
-//STEP 4: Setup DB and DB collection
-var mongoose = require('mongoose');
-var dbUrl = "mongodb+srv://masonDouglas:superpassword@cluster0.i4b1t.mongodb.net/realchat"
-var Message = mongoose.model('message',{ username : String, message : String})
-mongoose.connect(dbUrl , (err) => { 
-  if (err == null)
-    console.log('mongodb connected');
-  else
-  console.log('mongodb connected',err);
-})
+const { Server } = require("socket.io");
+const io = new Server(server);
 
 
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/index.html');
+});
 
-app.use(express.static(__dirname));
+io.on('connection', (socket) => {
+    socket.on('chat message', msg => {
+        io.emit('chat message', msg);
+    });
+});
 
-var server = app.listen(3000, () => {
-    console.log('The app is runing on the url localhost:', server.address().port);
-   });
+server.listen(3001, () => {
+    console.log('listening on *:3000');
+});
