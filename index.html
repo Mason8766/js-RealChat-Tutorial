@@ -4,12 +4,16 @@
     <title>Socket.IO chat</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="utf-8"/>
+  </head>
+  <body>
+    <!-- COMP 2068 - Real Time Chat Group -->
     <style>
+      /* Styling for the page */
       body {
-         margin: 0;
-         padding-bottom: 3rem; 
-         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-        }
+        margin: 0;
+        padding-bottom: 3rem; 
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+      }
 
       #form { 
         background: rgba(0, 0, 0, 0.15); 
@@ -20,6 +24,7 @@
         box-sizing: border-box; 
         backdrop-filter: blur(10px); 
       }
+
       .input { 
         border: none; 
         padding: 0 1rem; 
@@ -27,9 +32,11 @@
         border-radius: 2rem; 
         margin: 0.25rem; 
       }
+
       .input:focus { 
         outline: none; 
       }
+
       #form > button { 
         background: #333;
         border: none; 
@@ -40,14 +47,21 @@
         color: #fff; 
       }
 
-      #messages { list-style-type: none; margin: 0; padding: 0; }
-      #messages > li { padding: 0.5rem 1rem; }
-      #messages > li:nth-child(odd) { background: #efefef; }
+      /* Style messages */
+      #messages { 
+        list-style-type: none; margin: 0; padding: 0; 
+      }
+      
+      #messages > li { 
+        padding: 0.5rem 1rem; 
+      }
+      
+      #messages > li:nth-child(odd) { 
+        background: #efefef; 
+      }
     </style>
-  </head>
-  <body>
     <ul id="messages"></ul>
-
+    <!-- Add a form for user input -->
     <form id="form" action="">
       <input id="nameF" class="input" autocomplete="cc-name" />
       <input id="input" class="input" autocomplete="block" /><button>Send</button>
@@ -55,27 +69,57 @@
     <script src="/socket.io/socket.io.js"></script>
 
     <script>
+      // JS Script 
+      
+      // Initialize objects
       var socket = io();
-
       var messages = document.getElementById('messages');
       var form = document.getElementById('form');
       var input = document.getElementById('input');
 
+      // Add an event listener for submit button
+      // send values using socket.emit
       form.addEventListener('submit', function(e) {
         e.preventDefault();
-        if ( input.value) {
-          socket.emit('chat message', input.value,nameF.value);
+        if (input.value) {
+          var now = formatedDate();
+          socket.emit('chat message', now, input.value,nameF.value);
           input.value = '';
         }
       });
 
-      socket.on('chat message', function(msg,nme) {
+      // socket.on method for loading previous messages
+      // for loops loadMessages() function
+      socket.on('load messages', function(msgsJson) {
+        var i = 0;
+            for (i; i < msgsJson.length; i++) {
+                loadMessages(msgsJson[i]);
+            }
+      });
+
+      // loadMessages() function
+      // creates an li element with appropriate values
+      // appends the li item
+      function loadMessages(data) {
         var item = document.createElement('li');
-        item.textContent = `[${formatedDate()}] ${nme} : ${msg}`;
+        item.textContent = `${data.time} ${data.username} : ${data.message}`;
+        messages.appendChild(item);
+        window.scrollTo(0, document.body.scrollHeight);
+      }
+
+      // socket.on chat message function
+      // creates an li element once the user has entered a message
+      // appends the lement 
+      socket.on('chat message', function(time,msg,nme) {
+        var item = document.createElement('li');
+        now = formatedDate();
+        item.textContent = `${now} ${nme} : ${msg}`;
         messages.appendChild(item);
         window.scrollTo(0, document.body.scrollHeight);
       });
 
+      // function formatedDate
+      // formats the date to appropriate
       function formatedDate(){
         let now = new Date();
         return `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
