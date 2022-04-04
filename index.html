@@ -4,8 +4,9 @@
     <title>Socket.IO chat</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="utf-8"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
   </head>
-  <body>
+  <body onresize="changeUL()">
     <!-- COMP 2068 - Real Time Chat Group -->
     <style>
       /* Styling for the page */
@@ -14,7 +15,6 @@
         padding-bottom: 3rem; 
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
       }
-
       #form { 
         background: rgba(0, 0, 0, 0.15); 
         padding: 0.25rem; position: fixed; 
@@ -24,7 +24,14 @@
         box-sizing: border-box; 
         backdrop-filter: blur(10px); 
       }
-
+      #topMenu { 
+        background: rgba(0, 0, 0, 0.15); 
+        padding: 0.25rem; position: fixed; 
+        top: 0; left: 0; right: 0; 
+        display: flex; 
+        box-sizing: border-box; 
+        backdrop-filter: blur(10px);
+      }
       .input { 
         border: none; 
         padding: 0 1rem; 
@@ -49,7 +56,9 @@
 
       /* Style messages */
       #messages { 
-        list-style-type: none; margin: 0; padding: 0; 
+        list-style-type: none;
+        margin: 0px;
+        padding: 0; 
       }
       
       #messages > li { 
@@ -60,11 +69,15 @@
         background: #efefef; 
       }
     </style>
+      <div id="topMenu">
+        <h3>Comp-2068 | Real Time Chat</h3>
+        <p style="margin-left: 16px; margin-top: 8px">A simple NODE.JS application that uses Socket.io and MongoDB</p>
+      </div>
     <ul id="messages"></ul>
     <!-- Add a form for user input -->
     <form id="form" action="">
-      <input id="nameF" class="input" autocomplete="cc-name" />
-      <input id="input" class="input" autocomplete="block" /><button>Send</button>
+      <input id="nameF" class="input" autocomplete="cc-name" placeholder="Name"/>
+      <input id="input" class="input" autocomplete="block" placeholder="Message" /><button>Send</button>
     </form>
     <script src="/socket.io/socket.io.js"></script>
 
@@ -76,12 +89,11 @@
       var messages = document.getElementById('messages');
       var form = document.getElementById('form');
       var input = document.getElementById('input');
-
       // Add an event listener for submit button
       // send values using socket.emit
       form.addEventListener('submit', function(e) {
         e.preventDefault();
-        if (input.value) {
+        if (input.value && nameF.value) {
           var now = formatedDate();
           socket.emit('chat message', now, input.value,nameF.value);
           input.value = '';
@@ -102,7 +114,7 @@
       // appends the li item
       function loadMessages(data) {
         var item = document.createElement('li');
-        item.textContent = `${data.time} ${data.username} : ${data.message}`;
+        item.textContent = `[${data.time}] ${data.username} : ${data.message}`;
         messages.appendChild(item);
         window.scrollTo(0, document.body.scrollHeight);
       }
@@ -113,7 +125,7 @@
       socket.on('chat message', function(time,msg,nme) {
         var item = document.createElement('li');
         now = formatedDate();
-        item.textContent = `${now} ${nme} : ${msg}`;
+        item.textContent = `[${time}] ${nme} : ${msg}`;
         messages.appendChild(item);
         window.scrollTo(0, document.body.scrollHeight);
       });
@@ -122,7 +134,14 @@
       // formats the date to appropriate
       function formatedDate(){
         let now = new Date();
-        return `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
+        return `${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()} | ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
+      }
+
+      // function that automatically alligns the chat with the to menu item
+      changeUL();
+      function changeUL(){
+        var top = document.getElementById('topMenu');
+        messages.style.marginTop = top.clientHeight+"px";
       }
     </script>
   </body>
