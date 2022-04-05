@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Socket.IO chat</title>
+    <title>Real Time Chat Demo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="utf-8"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
@@ -71,13 +71,14 @@
     </style>
       <div id="topMenu">
         <h3>Comp-2068 | Real Time Chat</h3>
-        <p style="margin-left: 16px; margin-top: 8px">A simple NODE.JS application that uses Socket.io and MongoDB</p>
+        <p style="margin-left: 16px; margin-top: 8px">A simple NODE.JS application/demo that uses Socket.io and MongoDB</p>
       </div>
     <ul id="messages"></ul>
     <!-- Add a form for user input -->
     <form id="form" action="">
-      <input id="nameF" class="input" autocomplete="cc-name" placeholder="Name"/>
-      <input id="input" class="input" autocomplete="block" placeholder="Message" /><button>Send</button>
+      <input id="nameF" class="input" autocomplete="cc-name" placeholder="UserName"/>
+      <input id="input" class="input" autocomplete="block" placeholder="Message" />
+        <button>Send</button>
     </form>
     <script src="/socket.io/socket.io.js"></script>
 
@@ -112,6 +113,7 @@
       // loadMessages() function
       // creates an li element with appropriate values
       // appends the li item
+        //db call
       function loadMessages(data) {
         var item = document.createElement('li');
         item.textContent = `[${data.time}] ${data.username} : ${data.message}`;
@@ -122,6 +124,7 @@
       // socket.on chat message function
       // creates an li element once the user has entered a message
       // appends the lement 
+        //current screen call
       socket.on('chat message', function(time,msg,nme) {
         var item = document.createElement('li');
         now = formatedDate();
